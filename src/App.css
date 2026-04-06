@@ -1,38 +1,229 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  /* [수정] 최소 높이를 보장하되 내용이 길어지면 스크롤이 생기도록 설정 */
   min-height: 100vh;
+  background-color: #fcfcfc;
+  position: relative;
+  font-family: 'Pretendard', sans-serif;
+
+  /* [수정] 전체 페이지 스크롤 허용 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: auto;
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  /* [추가] 하단 버튼 배치를 위해 flex와 높이 설정 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 진행 상황 */
+.progress-container {
+  width: 100%;
+  padding: 30px 20px 10px 20px;
+  position: relative;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 16px;
+  background-color: #e4e4e4;
+  border-radius: 8px;
+  position: relative;
+}
+
+.progress-line-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #c2e9d2 0%, #aedbe4 50%, #abcbf2 100%);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+  z-index: 1;
+}
+
+.progress-steps-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
+}
+
+.progress-step {
+  width: 28px;
+  height: 28px;
+  background-color: #e4e4e4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.4s ease;
+}
+
+.progress-step.active {
+  background: linear-gradient(135deg, #aedbe4 0%, #abcbf2 100%);
+}
+
+.check-icon {
+  width: 18px;
+  height: 18px;
+  color: #3b3b3b;
+}
+
+.header {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  /* [수정] 간격을 100px에서 80px로 살짝 줄임 */
+  padding: 0 20px;
+  flex: 1;
+  /* [추가] 푸터가 아래로 가도록 영역을 채움 */
+}
+
+.row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.item-group {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 8px;
+}
+
+.image-card {
+  width: 150px;
+  height: 105px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.text-button {
+  width: 150px;
+  min-height: 55px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  text-align: center;
+  border-radius: 28px;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.25;
+  word-break: keep-all;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  color: #333;
 }
 
-.App-link {
-  color: #61dafb;
+/* 연결 점 스타일 */
+.dot {
+  width: 24px;
+  height: 24px;
+  /* 터치 영역을 충분히 확보 */
+  background-color: #adb5bd;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+
+  /* [핵심] 점 위에서만 스크롤 방지, 그 외 영역은 스크롤 가능 */
+  touch-action: none;
+  cursor: pointer;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.connector-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.line-dragging {
+  stroke: #007bff;
+  stroke-width: 3;
+  stroke-dasharray: 6;
+}
+
+.line-fixed {
+  stroke: #495057;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease;
+}
+
+.line-fixed.correct {
+  stroke: #00bcd4;
+  stroke-width: 6;
+}
+
+.line-fixed.wrong {
+  stroke: #ff5252;
+  stroke-width: 6;
+}
+
+/* 하단 버튼이 여유 있게 보이도록 푸터 간격 조정 */
+.footer {
+  padding: 40px 20px 80px 20px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.submit-button,
+.retry-button,
+.next-button {
+  width: 200px;
+  height: 55px;
+  border: none;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  background: linear-gradient(90deg, #b0e8f7 0%, #c4b5fd 100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s;
+}
+
+.submit-button:active,
+.retry-button:active,
+.next-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
