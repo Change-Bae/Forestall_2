@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './App.css';
 
+
 /**
  * 2단계: 장비-용도 알아가기 데이터
  */
