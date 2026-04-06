@@ -1,0 +1,301 @@
+/* 기본 폰트 설정 및 리셋 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background-color: #ffffff;
+  /* 모바일/크롬 개발자도구 등 확인시에도 드래그 방지 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 전체 컨테이너 (유저 제공 코드 참고) */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #fcfcfc;
+  /* 연한 회색 배경 (전체 영역 묶어줌) */
+  position: relative;
+
+  /* 세로 스크롤 허용, 가로 숨김 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 진행 상황 */
+.progress-container {
+  width: 100%;
+  padding: 30px 20px 10px 20px;
+  position: relative;
+  box-sizing: border-box;
+  /* (수정) 완전 딱 붙였던 0px에서 유저 피드백대로 살짝 간격을 줌 */
+  margin-bottom: 12px;
+}
+
+/* 퀴즈 타이틀 */
+.header {
+  text-align: center;
+  /* (수정) 유저 제공 코드처럼 padding도 깔끔하게 조절. */
+  padding: 20px 0;
+}
+
+.header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  /* (수정) 대제목과 소제목(부제목) 사이의 간격을 넓힘 */
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 15.5px;
+  color: #333333;
+  font-weight: 449;
+  margin: 0;
+}
+
+/* 진행 상황: 뒤의 깔리는 회색 바 (유저 코드 반영) */
+.progress-track {
+  width: 100%;
+  height: 16px;
+  background-color: #e4e4e4;
+  border-radius: 8px;
+  position: relative;
+  /* overflow: hidden; 삭제 -> 둥근 원이 밖으로 튀어나와 보여야하므로 제거합니다 */
+}
+
+/* 진행 중인 색상 채워지는 선 (유저 코드 반영: linear-gradient 3색) */
+.progress-line-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* 부모 track 16px에 맞춤 */
+  background: linear-gradient(90deg, #c2e9d2 0%, #aedbe4 50%, #abcbf2 100%);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+  z-index: 1;
+  /* 구슬보다 뒤로 */
+}
+
+/* 둥근 스텝 구슬들의 컨테이너를 트랙 위에 절대배치 */
+.progress-steps-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  /* 트랙(16px)의 중앙에서 수직정렬 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
+  /* active 선보다 앞으로 나오게 지정 */
+}
+
+/* 구슬 하나하나 (유저 코드 progress-step 참고) */
+.progress-step {
+  width: 28px;
+  height: 28px;
+  background-color: #e4e4e4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.4s ease;
+}
+
+/* 활성화 혹은 지나간 상태는 прозрачным하게 두면 배경 뒤 선이 비치지만, 현재 z-index 구조와 겹침으로 인해 아예 사라져 보입니다.
+   유저 코드 느낌대로 완료된 구슬은 투명(transparent) 혹은 아예 안 보이게 디자인된 것일 수 있으나,
+   정상적으로 체크표시 뒤로 동그라미가 보이게 하려면 배경 그라데이션 선과 비슷한 톤으로 유지하는 것이 좋습니다.
+   여기서는 확실하게 투명 대신 색을 입혀 원이 보이도록 수정합니다. */
+.progress-step.active {
+  /* background-color: transparent; 였던 것을 디자인에 맞춰 재조정. 
+     만약 유저가 transparent을 강하게 원했다면 배경바위를 뚫어야 했으나 
+     HTML상 뒤의 바위에 묻혔기 때문에 임시방편으로 진행색을 명시합니다. */
+  background: linear-gradient(135deg, #aedbe4 0%, #abcbf2 100%);
+  /* user 코드: background-color: transparent;  (만약 뒷배경이 비치게 했다면 뒷 배경 gradient에 의존했어야 함) */
+}
+
+
+/* 퀴즈 본문 영역 (유저 코드 content 참고) */
+.quiz-section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 0 20px;
+  /* (수정) 소제목과 첫 줄 버튼들 사이의 간격을 넓히기 위해 상단 마진 추가 */
+  margin-top: 15px; 
+}
+
+/* 두 버튼을 양 옆으로 나란히 두기 위한 감싸개 */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* (수정됨) 상하 간격을 다시 늘려달라는 요청에 따라 55px 로 재배치함 */
+  margin-bottom: 55px;
+}
+
+/* 버튼 세부 모양 */
+.btn-audio,
+.btn-word {
+  width: 150px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  /* 둥글게 */
+  font-weight: 700;
+  font-size: 16px;
+  background: #ffffff;
+  /* 기본 카드 색상 (흰색 배경에 그림자) */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  color: #333;
+}
+
+/* 오디오 아이콘 & 사운드 웨이브 */
+.audio-icon-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #25b6e5;
+}
+
+.sound-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+}
+
+.sound-wave span {
+  display: block;
+  width: 2px;
+  border-radius: 1px;
+  background-color: #25b6e5;
+}
+
+.sound-wave span:nth-child(1) {
+  height: 30%;
+}
+
+.sound-wave span:nth-child(2) {
+  height: 60%;
+}
+
+.sound-wave span:nth-child(3) {
+  height: 100%;
+}
+
+.sound-wave span:nth-child(4) {
+  height: 70%;
+}
+
+.sound-wave span:nth-child(5) {
+  height: 40%;
+}
+
+.sound-wave span:nth-child(6) {
+  height: 80%;
+}
+
+.sound-wave span:nth-child(7) {
+  height: 100%;
+}
+
+.sound-wave span:nth-child(8) {
+  height: 50%;
+}
+
+.sound-wave span:nth-child(9) {
+  height: 70%;
+}
+
+.sound-wave span:nth-child(10) {
+  height: 40%;
+}
+
+.sound-wave span:nth-child(11) {
+  height: 20%;
+}
+
+/* 버튼 상태 정의 (배경색 그라데이션 대신 디자인 톤 통일) */
+/* 선택되었을 때나 매칭되었을 때 등 유저 이미지에선 약간 보라색~파란색 빛 배경이었음 */
+.btn-status-default {
+  background: #ffffff;
+}
+
+.btn-status-matched {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.btn-status-correct {
+  /* 확실히 맞았을 때 피드백 톤 변경가능 (일단 matched와 같은 보라/파랑 톤 느낌) */
+  background: linear-gradient(135deg, #c2e9d2 0%, #aedbe4 100%);
+}
+
+.btn-status-wrong {
+  /* 틀렸을 때 */
+  background: #ffe3e3;
+}
+
+
+/* 하단 문구 라벨은 버튼 밖 절대배치 */
+.button-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.connect-label {
+  position: absolute;
+  bottom: -22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+  /* 톤다운된 회색 */
+  white-space: nowrap;
+}
+
+/* Footer (제출 버튼 영역) - 유저 제공 코드 복붙 수준 조정 */
+.footer {
+  padding: 40px 20px 80px 20px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.bottom-btn {
+  width: 200px;
+  height: 55px;
+  border: none;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  background: linear-gradient(90deg, #b0e8f7 0%, #c4b5fd 100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s;
+}
+
+.bottom-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
