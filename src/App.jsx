@@ -1,122 +1,165 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [page, setPage] = useState(1);
+  const [dob, setDob] = useState('');
+  const [name, setName] = useState('');
+  const [language, setLanguage] = useState('한국어');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Form is valid if DOB is exactly 6 digits and name is not empty
+  const isFormValid = dob.length === 6 && name.trim().length > 0;
+
+  const handleStartClick = () => {
+    if (isFormValid) {
+      setPage(2);
+    }
+  };
+
+  // DB에 저장하는 함수
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch('http://localhost:3001/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, birthdate: dob, language })
+      });
+      const data = await res.json();
+      console.log(data.message);
+      setPage(3); // DB 저장 후 3페이지로 이동
+    } catch (err) {
+      console.error('저장 실패:', err);
+      setError('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container">
+      {/* PAGE 1 */}
+      {page === 1 && (
+        <div className="page page1">
+          <h1 className="logo pixel-font">FORESTALL</h1>
 
-      <div className="ticks"></div>
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="생년월일 6자리를 입력해주세요"
+              value={dob}
+              maxLength={6}
+              onChange={(e) => setDob(e.target.value.replace(/[^0-9]/g, ''))}
+            />
+            <input
+              type="text"
+              placeholder="이름을 입력해주세요"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <div className="select-wrapper">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="한국어">한국어</option>
+                <option value="영어">영어</option>
+                <option value="중국어">중국어</option>
+              </select>
+            </div>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <button
+            className={`start-btn ${isFormValid ? 'active' : 'disabled'}`}
+            onClick={handleStartClick}
+            disabled={!isFormValid}
+          >
+            시작
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* PAGE 2 */}
+      {page === 2 && (
+        <div className="page page2">
+          <h1 className="logo pixel-font">FORESTALL</h1>
+
+          <div className="modal-container">
+            <div className="modal-header">
+              <div className="dot red"></div>
+              <div className="dot yellow"></div>
+              <div className="dot green"></div>
+            </div>
+            <div className="modal-content">
+              <p className="confirm-text">
+                {dob} {name} {language} 가 맞습니까?
+              </p>
+              <p className="sub-text">
+                이수증 발급 시 본인 확인용으로 사용되므로<br />올바르게 작성해주세요!
+              </p>
+              {error && (
+                <p style={{ color: 'red', fontSize: '0.8rem', marginBottom: '8px' }}>
+                  {error}
+                </p>
+              )}
+              <div className="modal-actions">
+                <button
+                  className="pixel-btn cancel"
+                  onClick={() => setPage(1)}
+                  disabled={isLoading}
+                >
+                  ❌
+                </button>
+                <button
+                  className="pixel-btn confirm"
+                  onClick={handleConfirm}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '저장 중...' : '✅'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button className="start-btn disabled" disabled style={{ opacity: 0.5 }}>
+            시작
+          </button>
+        </div>
+      )}
+
+      {/* PAGE 3 */}
+      {page === 3 && (
+        <div className="page page3">
+          <h1 className="logo pixel-font">FORESTALL</h1>
+          <p className="subtitle pixel-font">각 단계를 클릭하여 문제를 푸세요</p>
+
+          <div className="steps-container">
+            <div className="step-btn">
+              <span className="step-num">1단계</span>
+              <span className="step-title">개념-단어 연결 짓기</span>
+            </div>
+            <div className="step-btn">
+              <span className="step-num">2단계</span>
+              <span className="step-title">장비-용도 알아가기</span>
+            </div>
+            <div className="step-btn">
+              <span className="step-num">3단계</span>
+              <span className="step-title">돌발! OX 퀴즈 맞추기</span>
+            </div>
+            <div className="step-btn">
+              <span className="step-num">4단계</span>
+              <span className="step-title">빈칸을 채워보자!</span>
+            </div>
+          </div>
+
+          <div className="bottom-pill"></div>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
